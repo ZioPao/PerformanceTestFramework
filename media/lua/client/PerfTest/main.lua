@@ -2,13 +2,14 @@
 
 -----------------
 
-local PerfTest = {
+PerfTest = {
     ---@type table<registeredMethodTab>
     registeredMethods = {},
+    originalMethods = {},
     isEnabled = true
 }
 
-local baseString = "%s %s -> %.4f ms"
+local baseString = "%s %s -> %.6f ms"
 local os_time = os.time
 
 
@@ -18,17 +19,20 @@ end
 
 ---Run it to initialize PerfTest
 function PerfTest.Init()
-    PerfTest.startTime = os.time() + 1
-    local function WaitForPerfTest()
-        local cTime = os.time()
-        if cTime > PerfTest.startTime then
-            print("Perf test initialized")
-            PerfTest.SetupRegisteredMethods()
-            Events.OnTick.Remove(WaitForPerfTest)
+    local function OnGameStart()
+        local function WaitForPerfTest()
+            local cTime = os.time()
+            if cTime > PerfTest.startTime then
+                print("Perf test initialized")
+                PerfTest.SetupRegisteredMethods()
+                Events.OnTick.Remove(WaitForPerfTest)
+            end
         end
-    end
+        PerfTest.startTime = os.time() + 1
+        Events.OnTick.Add(WaitForPerfTest)
 
-    Events.OnTick.Add(WaitForPerfTest)
+    end
+    Events.OnGameStart.Add(OnGameStart)
 end
 
 ---Register a method that will be initialized after a while
@@ -49,21 +53,23 @@ function PerfTest.SetupRegisteredMethods()
     end
 end
 
----comment
+---Setup a single method and stores the og one in PerfTest.originalMethods table
 ---@param className string
 ---@param classTable table
 ---@param funcName string
 ---@private
 function PerfTest.SetupSingleMethod(className, classTable, funcName)
+    local index = className .. "_" .. funcName
+    PerfTest.originalMethods[index] = classTable[funcName]
     classTable[funcName] = function(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
         local sTime
         if PerfTest.isEnabled then
             sTime = os_time()
         end
-        PerfTest.ogMethods[funcName](arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+        PerfTest.originalMethods[index](arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
         if PerfTest.isEnabled then
             local eTime = os_time()
-            local fTime = (eTime - sTime)
+            local fTime = (eTime - sTime)*1000 -- convert them to ms
             local stringToPrint = string.format(baseString, className, funcName, fTime)
             PerfTest.print(stringToPrint)
         end
