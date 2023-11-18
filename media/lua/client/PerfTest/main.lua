@@ -6,6 +6,7 @@ local PerfTest = {
     ---@type registeredMethodTab
     registeredMethods = {},
     originalMethods = {},
+    times = {},
     isEnabled = true
 }
 
@@ -45,6 +46,7 @@ function PerfTest.RegisterMethod(className, classTable, funcName)
         PerfTest.registeredMethods[className] = {}
     end
 
+    print("TPF: inserting " .. className .. " " .. funcName)
     table.insert(PerfTest.registeredMethods[className], {classTable = classTable, funcName = funcName})
 end
 
@@ -53,7 +55,7 @@ end
 function PerfTest.SetupRegisteredMethods()
     PerfTest.print("initializing registered methods")
 
-    for className, tab in ipairs(PerfTest.registeredMethods) do
+    for className, tab in pairs(PerfTest.registeredMethods) do
         print(className)
         for i=1, #tab do
             local singleMethod = tab[i]
@@ -79,8 +81,11 @@ function PerfTest.SetupSingleMethod(className, classTable, funcName)
         if PerfTest.isEnabled then
             local eTime = os_time()
             local fTime = (eTime - sTime)*1000 -- convert them to ms
-            local stringToPrint = string.format(baseString, className, funcName, fTime)
-            PerfTest.print(stringToPrint)
+
+            PerfTest.times[className .. "_" .. funcName] = fTime
+
+            --local stringToPrint = string.format(baseString, className, funcName, fTime)
+            --PerfTest.print(stringToPrint)
         end
     end
 
