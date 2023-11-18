@@ -1,9 +1,9 @@
----@alias registeredMethodTab {className : string, classTable : table, funcName : string}
-
+---@alias methodElement { classTable : table, funcName : string }
+---@alias registeredMethodTab table<string,table<integer, methodElement>>
 -----------------
 
-PerfTest = {
-    ---@type table<registeredMethodTab>
+local PerfTest = {
+    ---@type registeredMethodTab
     registeredMethods = {},
     originalMethods = {},
     isEnabled = true
@@ -40,16 +40,25 @@ end
 ---@param classTable table
 ---@param funcName string Name of the function. Can be static or an object method
 function PerfTest.RegisterMethod(className, classTable, funcName)
-    table.insert(PerfTest.registeredMethods, {className = className, classTable = classTable, funcName = funcName})
+    
+    if PerfTest.registeredMethods[className] == nil then
+        PerfTest.registeredMethods[className] = {}
+    end
+
+    table.insert(PerfTest.registeredMethods[className], {classTable = classTable, funcName = funcName})
 end
 
 ---Setup registered methods
 ---@private
 function PerfTest.SetupRegisteredMethods()
     PerfTest.print("initializing registered methods")
-    for i=1, #PerfTest.registeredMethods do
-        local regTab = PerfTest.registeredMethods[i]
-        PerfTest.SetupSingleMethod(regTab.className, regTab.classTable, regTab.funcName)
+
+    for className, tab in ipairs(PerfTest.registeredMethods) do
+        print(className)
+        for i=1, #tab do
+            local singleMethod = tab[i]
+            PerfTest.SetupSingleMethod(tostring(className), singleMethod.classTable, singleMethod.funcName)
+        end
     end
 end
 
