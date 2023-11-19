@@ -1,7 +1,17 @@
+
 local LayoutElement = require "PerfTest/UI/LayoutElement"
 
+----------------
+
+---@class HorizontalLayout : LayoutElement
 local HorizontalLayout = LayoutElement:derive("HorizontalLayout")
 
+---comment
+---@param x any
+---@param y any
+---@param width any
+---@param height any
+---@return HorizontalLayout
 function HorizontalLayout:new(x, y, width, height)
     local o = LayoutElement:new(x, y, width, height)
     setmetatable(o, self)

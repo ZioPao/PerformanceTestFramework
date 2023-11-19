@@ -4,6 +4,7 @@
 local VerticalLayout = require("PerfTest/UI/VerticalLayout")
 --------------------------
 
+---@class CollapseList : VerticalLayout
 local CollapseList = VerticalLayout:derive("CollapseList")
 
 function CollapseList:new(x, y, width, height)

@@ -3,7 +3,7 @@
 local LayoutElement = require "PerfTest/UI/LayoutElement"
 ---------------------------
 
-
+---@class ScrollPanel : LayoutElement
 local ScrollPanel = LayoutElement:derive("ScrollPanel")
 
 function ScrollPanel:new(x, y, w, h)

@@ -4,7 +4,7 @@ local PerfTest = require("PerfTest/main")
 local ScrollPanel = require("PerfTest/UI/ScrollPanel")
 local VerticalLayout = require("PerfTest/UI/VerticalLayout")
 local HorizontalLayout = require("PerfTest/UI/HorizontalLayout")
-local CollapseList2 = require("PerfTest/UI/CollapseList")
+local CollapseList = require("PerfTest/UI/CollapseList")
 
 -----------------
 local BORDER_COLOR = {r=1, g=1, b=1, a=0.4}
@@ -12,6 +12,8 @@ local BORDER_COLOR = {r=1, g=1, b=1, a=0.4}
 
 -- TODO List registered methods, grouped by ClassName
 
+---@class TestPerfUI
+---@field timePanels table<integer, ISButton>
 TestPerfUI = ISPanel:derive("TestPerfUI")
 
 function TestPerfUI:new(x, y, width, height)
@@ -48,7 +50,7 @@ function TestPerfUI:setupScrollPanel()
 
     for className, tab in pairs(PerfTest.registeredMethods) do
         print("TPF: INITIALIZING FOR CLASS: " .. className)
-        local classCollapseList = CollapseList2:new(0, 0, width, 24)
+        local classCollapseList = CollapseList:new(0, 0, width, 24)
         local horizontalLayout = HorizontalLayout:new(classCollapseList.marginX, 0, width - classCollapseList.marginX, 24)
         local classLabel = ISLabel:new(0, 0, 20, className, 1, 1, 1, 1, UIFont.Medium)
         horizontalLayout:addElement(classLabel)
@@ -65,13 +67,12 @@ function TestPerfUI:setupScrollPanel()
             print("TPF: INITIALIZING FOR FUNC: " .. singleMethod.funcName)
             local methodLayout = HorizontalLayout:new(classCollapseList.marginX, 0, width, 24)
             
-            local methodLabel = ISLabel:new(0, 0, 20, singleMethod.funcName, 1, 1, 1, 1, UIFont.Medium)
+            local methodLabel = ISLabel:new(0, 0, 20, singleMethod.funcName, 1, 1, 1, 1, UIFont.Small)
+            local methodTime = ISButton:new(0, 0, width/3, 24, "", self, nil)
             methodLayout:addSpacer(5)
             methodLayout:addElement(methodLabel)
-
-            local methodTime = ISLabel:new(0, 0, 20, "", 1, 1, 1, 1, UIFont.Medium)
-            methodLayout:addRightAnchoredChild(methodTime, 76, 0)
-
+            methodLayout:addRightAnchoredChild(methodTime, 1, 0)
+            
             methodLayout.borderColor = BORDER_COLOR
             methodLayout.marginY = 2
             methodLayout.marginLeft = 8
@@ -97,7 +98,9 @@ function TestPerfUI:render()
     for k, panel in pairs(self.timePanels) do
         -- get fTime
         local fTime = PerfTest.times[k]
-        panel:setName(tostring(fTime))
+        if fTime ~= nil and fTime ~= "" then
+            panel:setTitle(string.format("%.6f", fTime))
+        end
     end
 end
 

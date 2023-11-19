@@ -2,8 +2,15 @@
 
 require "ISUI/ISUIElement"
 
+---@class LayoutElement : ISUIElement
 local LayoutElement = ISUIElement:derive("LayoutElement")
 
+---comment
+---@param x any
+---@param y any
+---@param width any
+---@param height any
+---@return LayoutElement
 function LayoutElement:new(x, y, width, height)
     local o = ISUIElement:new(x, y, width, height)
     setmetatable(o, self)

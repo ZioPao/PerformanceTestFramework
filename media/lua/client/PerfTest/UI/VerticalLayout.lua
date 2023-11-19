@@ -4,7 +4,7 @@
 local LayoutElement = require "PerfTest/UI/LayoutElement"
 ------------------
 
-
+---@class VerticalLayout : LayoutElement
 local VerticalLayout = LayoutElement:derive("VerticalLayout")
 
 function VerticalLayout:new(x, y, width, height)
